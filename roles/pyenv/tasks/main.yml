@@ -1,0 +1,64 @@
+---
+
+- name: Install packages
+  yum:
+    name: '{{ packages }}'
+    state: latest
+  vars:
+    packages:
+      - make
+      - git
+      - gcc
+      - libselinux-python
+      - zlib-devel
+      - openssl-devel
+      - bzip2-devel
+      - readline-devel
+      - libffi-devel
+      - sqlite-devel
+      - gdbm-devel
+      - patch
+
+- name: Install pyenv
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: '{{ pyenv_path }}'
+    version: master
+    accept_hostkey: yes
+
+- name: Install pyenv-virtualenv
+  git:
+    repo: https://github.com/yyuu/pyenv-virtualenv.git
+    dest: '{{ pyenv_path }}/plugins/pyenv-virtualenv'
+    version: master
+    accept_hostkey: yes
+
+- name: Install .pyenvrc
+  template:
+    src: .pyenvrc.j2
+    dest: '{{ pyenv_path }}/.pyenvrc'
+    owner: '{{ pyenv_owner }}'
+    mode: 0644
+
+- name: Load pyenv env variables in {{ pyenv_setting_path }}
+  lineinfile:
+    dest: '{{ pyenv_setting_path }}'
+    regexp: \.pyenvrc$
+    line: source {{ pyenv_path }}/.pyenvrc
+    state: present
+    create: yes
+
+- name: Install Python interpreters {{ pyenv_python_versions }}
+  shell: . {{ pyenv_path }}/.pyenvrc && env PYTHON_CONFIGURE_OPTS="{{ pyenv_python_configure_opts }}" pyenv install {{ item }}
+  args:
+    creates: '{{ pyenv_path }}/versions/{{ item }}/bin/python'
+  with_items: '{{ pyenv_python_versions }}'
+
+- name: Create virtual environments
+  shell: . {{ pyenv_path }}/.pyenvrc && pyenv virtualenv {{ item.py_version }} {{ item.venv_name }}
+  args:
+    creates: '{{ pyenv_path }}/versions/{{ item.venv_name }}/bin/python'
+  with_items: '{{ pyenv_virtualenvs }}'
+
+- name: Set pyenv global
+  shell: . {{ pyenv_path }}/.pyenvrc && pyenv global {{ pyenv_global }} && pyenv rehash

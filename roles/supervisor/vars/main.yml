@@ -1,0 +1,57 @@
+---
+
+supervisor_bin_path: '{{ pyenv_bin_directory }}/supervisord'
+supervisorctl_bin_path: '{{ pyenv_bin_directory }}/supervisorctl'
+
+# Install a specific version of Supervisor by setting it here (e.g. '3.3.1').
+supervisor_version: latest
+
+# Choose whether to use an init script or systemd unit configuration to start
+# Supervisor when it's installed and/or after a system boot.
+supervisor_started: yes
+supervisor_enabled: yes
+
+supervisor_config_path: /etc/supervisor
+supervisor_log_dir: /var/log/supervisor
+
+# A list of `program`s Supervisor will control. Example commented out below.
+# - name: 'apache'
+#   command: apache2ctl -c "ErrorLog /dev/stdout" -DFOREGROUND
+#   state: present
+#   configuration: |
+#     autostart=true
+#     autorestart=true
+#     startretries=1
+#     startsecs=1
+#     redirect_stderr=true
+#     stderr_logfile=/var/log/apache-err.log
+#     stdout_logfile=/var/log/apache-out.log
+#     user=root
+#     killasgroup=true
+#     stopasgroup=true
+supervisor_programs:
+  - name: daphne
+    command: daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers elite.asgi:application
+    state: present
+    configuration: |
+      autostart=true
+      autorestart=true
+      socket=tcp://localhost:8000
+      directory={{ working_directory }}{{ repo_directory }}
+      numprocs={{ ansible_processor_vcpus }}
+      process_name=asgi%(process_num)d
+      stdout_logfile={{ supervisor_log_dir }}/asgi.log
+      redirect_stderr=true
+
+supervisor_nodaemon: no
+
+supervisor_user: root
+supervisor_password: root
+
+supervisor_unix_http_server_enable: yes
+supervisor_unix_http_server_socket_path: /var/run/supervisor.sock
+supervisor_unix_http_server_password_protect: yes
+
+supervisor_inet_http_server_enable: no
+supervisor_inet_http_server_port: '*:9001'
+supervisor_inet_http_server_password_protect: yes

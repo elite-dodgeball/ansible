@@ -1,0 +1,4 @@
+---
+
+- import_tasks: ../../../library/install_git.yml
+- import_tasks: repo.yml

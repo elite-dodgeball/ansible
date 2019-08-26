@@ -1,0 +1,17 @@
+---
+
+pyenv_env: system
+pyenv_global: 3.5.2
+
+pyenv_path: '{% if pyenv_env == "user" %}{{ ansible_env.HOME }}/pyenv{% else %}/usr/local/pyenv{% endif %}'
+pyenv_owner: '{{ ansible_env.USER }}'
+
+pyenv_setting_path: '{% if pyenv_env == "user" %}~/.bashrc{% else %}/etc/profile.d/pyenv.sh{% endif %}'
+pyenv_init_options: '{% if pyenv_env != "user" %}--no-rehash{% endif %}'
+pyenv_python_configure_opts: ''
+
+pyenv_python_versions:
+  - '{{ pyenv_global }}'
+
+pyenv_virtualenvs:
+  - { venv_name: '{{ app_name }}', py_version: '{{ pyenv_global }}' }

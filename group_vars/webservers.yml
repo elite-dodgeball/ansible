@@ -1,0 +1,17 @@
+---
+
+app_name: elite-dodgeball
+
+working_directory: /{{ app_name }}
+repo_directory: /web
+
+django_media_url: /media/
+django_media_root: '{{ lookup("env", "MEDIA_ROOT") }}'
+
+django_static_url: /static/
+django_staticfiles_dirs: '{{ lookup("env", "STATICFILES_DIRS") }}'
+
+pyenv_directory: /usr/local/pyenv
+pyenv_bin_directory: '{{ pyenv_directory }}/versions/{{ app_name }}/bin'
+
+amazon_linux_package_version: 7

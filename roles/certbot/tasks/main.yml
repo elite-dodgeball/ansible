@@ -1,0 +1,46 @@
+---
+
+# package
+
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+    state: latest
+    executable: '{{ pyenv_bin_directory }}/pip'
+
+- include_tasks: epel.yml
+
+- name: Install augeas
+  package:
+    name: augeas
+    state: latest
+
+- name: Install certbot
+  package:
+    name: certbot
+    state: latest
+
+# create-cert
+
+- name: Set certbot script variable
+  set_fact:
+    certbot_script: /usr/bin/certbot
+
+- include_tasks: create-cert.yml
+  with_items: '{{ certbot_certs }}'
+  when:
+    - certbot_create_if_missing
+    - certbot_create_method == 'standalone'
+  loop_control:
+    loop_var: cert_item
+
+# cron
+
+- name: Add cron job for renewal
+  cron:
+    name: certbot automatic renewal
+    job: '{{ certbot_script }} renew {{ certbot_auto_renew_options }}'
+    minute: '{{ certbot_auto_renew_minute }}'
+    hour: '{{ certbot_auto_renew_hour }}'
+    user: '{{ certbot_auto_renew_user }}'
+  when: certbot_auto_renew

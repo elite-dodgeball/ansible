@@ -1,0 +1,10 @@
+---
+
+- hosts: webservers
+  roles:
+    - common
+    - pyenv
+    - codebase
+    - supervisor
+    - certbot
+    - nginx

@@ -1,0 +1,40 @@
+---
+
+- name: Make working directory
+  file:
+    path: '{{ working_directory }}'
+    state: directory
+    mode: '0777'
+
+- name: Remove web directory
+  file:
+    path: '{{ working_directory}}{{ repo_directory }}'
+    state: absent
+
+- name: Clone git repo
+  git:
+    repo: https://github.com/elite-dodgeball/web.git
+    dest: '{{ working_directory }}{{ repo_directory }}'
+    version: master
+    accept_hostkey: yes
+    force: yes
+    recursive: no
+  become: no
+
+- name: Make media directory
+  file:
+    path: '{{ django_media_root }}'
+    state: directory
+    mode: '0777'
+
+- name: Copy static directory
+  copy:
+    src: '{{ working_directory }}{{ repo_directory }}{{ django_static_url }}'
+    dest: '{{ django_staticfiles_dirs }}'
+    state: directory
+    mode: '0755'
+
+- name: Install dependencies
+  pip:
+    requirements: '{{ working_directory }}{{ repo_directory }}/requirements.txt'
+    executable: '{{ pyenv_bin_directory }}/pip'

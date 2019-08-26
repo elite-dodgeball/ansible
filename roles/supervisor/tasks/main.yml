@@ -1,0 +1,81 @@
+---
+
+- name: Install supervisor
+  pip:
+    name: supervisor
+    state: latest
+    executable: '{{ pyenv_bin_directory }}/pip'
+
+- name: Create supervisor log directory
+  file:
+    path: '{{ supervisor_log_dir }}'
+    state: directory
+    mode: 0755
+
+# config
+
+- name: Create supervisor directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - '{{ supervisor_config_path }}'
+    - '{{ supervisor_config_path }}/conf.d'
+
+- name: Create supervisor config
+  template:
+    src: supervisord.conf.j2
+    dest: "{{ supervisor_config_path }}/supervisord.conf"
+    mode: 0644
+  notify: restart supervisor
+
+- name: Create supervisor program config
+  template:
+    src: program.conf.j2
+    dest: "{{ supervisor_config_path }}/conf.d/{{ item.name }}.conf"
+    force: true
+    owner: root
+    group: root
+    mode: 0644
+  when: item.state|default('present') != 'absent'
+  with_items: "{{ supervisor_programs }}"
+  notify: restart supervisor
+
+# init
+
+- name: Copy supervisor init file (non-systemd)
+  template:
+    src: supervisord.init.j2
+    dest: /etc/init.d/supervisord
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_service_mgr != 'systemd'
+  notify: restart supervisor
+
+- name: Copy supervisor unit file (systemd)
+  template:
+    src: supervisord.unit.j2
+    dest: /etc/systemd/system/supervisord.service
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_service_mgr == 'systemd'
+  notify: restart supervisor
+
+# service
+
+- name: Ensure supervisor is started
+  service:
+    name: supervisord
+    state: started
+  when: supervisor_started
+
+- name: Ensure supervisor is enabled at boot
+  service:
+    name: supervisord
+    enabled: true
+  when: supervisor_enabled
