@@ -1,8 +1,8 @@
 {% block server_redirect %}
-{% if item.server_name_redirect is defined %}
+{% if item.server_name_redirect %}
 server {
     listen       {{ item.listen | default('80') }};
-    {% if item.listen != '80' %}
+    {% if item.listen != 80 %}
     listen       80;
     {% endif %}
     server_name  www.{{ item.server_name.split(' ')[0] }};
@@ -12,7 +12,7 @@ server {
 {% endblock %}
 
 {% block https_redirect %}
-{% if item.server_https_redirect is defined %}
+{% if item.server_https_redirect %}
 server {
     listen       80;
     server_name  {{ item.server_name }};

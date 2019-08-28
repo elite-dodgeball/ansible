@@ -31,7 +31,7 @@ supervisor_log_dir: /var/log/supervisor
 #     stopasgroup=true
 supervisor_programs:
   - name: daphne
-    command: daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers elite.asgi:application
+    command: '{{ pyenv_bin_directory }}/daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers elite.asgi:application'
     state: present
     configuration: |
       autostart=true
