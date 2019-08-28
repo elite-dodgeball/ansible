@@ -1,0 +1,21 @@
+---
+
+- include_tasks: epel.yml
+
+- name: Install redis
+  package:
+    name: redis
+    state: latest
+
+- name: Copy redis config
+  template:
+    src: redis.conf.j2
+    dest: '{{ redis_conf_path }}'
+    mode: 0644
+  notify: restart redis
+
+- name: Enable redis service
+  service:
+    name: '{{ redis_daemon }}'
+    state: started
+    enabled: yes
