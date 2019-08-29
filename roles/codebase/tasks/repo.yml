@@ -31,7 +31,6 @@
   copy:
     src: '{{ working_directory }}{{ repo_directory }}{{ django_static_url }}'
     dest: '{{ django_staticfiles_dirs }}'
-    state: directory
     mode: '0755'
 
 - name: Install dependencies
