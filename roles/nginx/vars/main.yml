@@ -83,11 +83,17 @@ nginx_vhosts:
       ssl_certificate /etc/letsencrypt/live/{{ app_name }}.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/{{ app_name }}.com/privkey.pem;
       ssl_stapling on;
+      location /robots.txt {
+        alias {{ django_staticfiles_dirs }}/robots.txt;
+      }
+      location /favicon.ico {
+        alias {{ django_staticfiles_dirs }}/favicon.ico;
+      }
       location {{ django_media_url }} {
-        alias {{ django_media_root }};
+        alias {{ django_media_root }}/;
       }
       location {{ django_static_url }} {
-        alias {{ django_staticfiles_dirs }};
+        alias {{ django_staticfiles_dirs }}/;
       }
       location / {
         try_files $uri @proxy_to_app;
