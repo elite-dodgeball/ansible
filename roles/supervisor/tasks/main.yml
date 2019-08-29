@@ -12,6 +12,12 @@
     state: directory
     mode: 0755
 
+- name: Create supervisor run directory
+  file:
+    path: '{{ supervisor_run_dir }}'
+    state: directory
+    mode: 0755
+
 # config
 
 - name: Create supervisor directory

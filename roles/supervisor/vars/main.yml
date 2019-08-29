@@ -13,6 +13,7 @@ supervisor_enabled: yes
 
 supervisor_config_path: /etc/supervisor
 supervisor_log_dir: /var/log/supervisor
+supervisor_run_dir: /run/daphne
 
 # A list of `program`s Supervisor will control. Example commented out below.
 # - name: 'apache'
@@ -31,7 +32,8 @@ supervisor_log_dir: /var/log/supervisor
 #     stopasgroup=true
 supervisor_programs:
   - name: daphne
-    command: '{{ pyenv_bin_directory }}/daphne -u /run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers elite.asgi:application'
+    type: fcgi
+    command: '{{ pyenv_bin_directory }}/daphne -u {{ supervisor_run_dir }}/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers elite.asgi:application'
     state: present
     configuration: |
       autostart=true

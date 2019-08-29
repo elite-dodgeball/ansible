@@ -1,4 +1,4 @@
-[program:{{ item.name }}]
+[{% if item.configuration is defined %}{{ item.type }}-{% endif %}program:{{ item.name }}]
 command={{ item.command }}
 {% if item.configuration is defined %}
 {{ item.configuration }}
