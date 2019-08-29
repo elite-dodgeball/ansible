@@ -38,3 +38,18 @@ STRIPE_PUBLIC_KEY="pk_test_123456789012345678901234"
 ```
 
 Make sure they are in `/etc/environment` and loaded into the session or whatever you decide before running `ansible` or it'll probably bomb out at `codebase : Make media directory`.
+
+This could be automated by using EC2's [`user data`](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html) feature.
+
+```bash
+#!/bin/bash
+
+yum update -y
+yum install -y git
+
+amazon-linux-extras install -y ansible2
+
+cat > /etc/environment << 'EOF'
+...
+EOF
+```
