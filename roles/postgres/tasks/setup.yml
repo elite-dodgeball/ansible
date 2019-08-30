@@ -1,0 +1,13 @@
+---
+
+- include_tasks: epel.yml
+
+- name: Install PostgreSQL packages
+  package:
+    name: '{{ postgresql_packages }}'
+    state: latest
+
+- name: Install PostgreSQL Python libraries
+  package:
+    name: '{{ postgresql_python_library }}'
+    state: present

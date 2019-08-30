@@ -3,3 +3,4 @@
 - hosts: databases
   roles:
     - redis
+    - postgres
